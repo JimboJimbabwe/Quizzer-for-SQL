@@ -1,4 +1,6 @@
 import random
+import tkinter as tk
+from tkinter import messagebox
 
 # Define the SQL commands, purposes, and example templates
 commands = {
@@ -142,28 +144,50 @@ def check_answer(correct_answer, user_input):
     return correct_answer.lower().strip() == user_input.lower().strip()
 
 
-def main():
-    score = 0
-    total_questions = 0
+def main_gui():
+    # Create main window
+    root = tk.Tk()
+    root.title("SQL Practice Quiz")
 
-    while True:
-        question, correct_answer = generate_quiz_question()
-        total_questions += 1
+    # Create and set variables
+    question_var = tk.StringVar()
+    user_input_var = tk.StringVar()
 
-        print(question)
-        user_input = input("Enter the SQL command: ").strip()
+    # Generate the first question
+    question, correct_answer = generate_quiz_question()
+    question_var.set(question)
 
+    # Define callback functions for the buttons
+    def check_gui_answer():
+        nonlocal correct_answer
+        user_input = user_input_var.get()
         if check_answer(correct_answer, user_input):
-            print("Correct!\n")
-            score += 1
+            messagebox.showinfo("Result", "Correct!")
         else:
-            print(f"Wrong. The correct command is:\n{correct_answer}\n")
+            messagebox.showinfo("Result", f"Wrong. The correct command is:\n{correct_answer}")
+        # Generate next question
+        next_question()
 
-        print(f"Score: {score}/{total_questions}\n")
-        cont = input("Want another question? (yes/no): ").strip().lower()
-        if cont != "yes":
-            break
+    def next_question():
+        nonlocal correct_answer
+        question, correct_answer = generate_quiz_question()
+        question_var.set(question)
+        user_input_var.set('')  # Clear the input
 
+    # Create and place widgets
+    question_label = tk.Label(root, textvariable=question_var, wraplength=400, padx=20, pady=20)
+    question_label.pack(pady=20)
+
+    user_input_entry = tk.Entry(root, textvariable=user_input_var, width=50)
+    user_input_entry.pack(pady=20)
+
+    check_button = tk.Button(root, text="Check Answer", command=check_gui_answer)
+    check_button.pack(pady=10)
+
+    next_button = tk.Button(root, text="Next Question", command=next_question)
+    next_button.pack(pady=10)
+
+    root.mainloop()
 
 if __name__ == "__main__":
-    main()
+    main_gui()
